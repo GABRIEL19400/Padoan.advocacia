@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Padoan Advocacia</title>
+  <meta name="description" content="Escritório de advocacia especializado em Direito Civil, Trabalhista e Previdenciário.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav" aria-label="Menu principal">
+  <a href="#" class="logo" aria-label="Padoan Advocacia - início">
+    <span class="logo-icone">⚖</span>
+    <span>Padoan <em>Advocacia</em></span>
+  </a>
+  <div class="nav-links">
+    <a href="#sobre">Sobre</a>
+    <a href="#areas">Áreas</a>
+    <a href="#agenda">Consulta</a>
+    <a href="#contato">Contato</a>
+    <button id="btn-tema" aria-label="Alternar modo escuro" title="Alternar tema">🌙</button>
+  </div>
+  <button class="nav-mobile-btn" id="nav-toggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="inicio">
+  <div class="hero-conteudo">
+    <p class="hero-subtitulo">Padoan Advocacia</p>
+    <h1>Defendendo<br><em>seus direitos</em></h1>
+    <p class="hero-descricao">Advocacia especializada e estratégica com atendimento humanizado.</p>
+    <div class="hero-acoes">
+      <a href="#agenda" class="btn btn-primario">Agendar Consulta</a>
+      <a href="#areas"  class="btn btn-secundario">Nossas Áreas</a>
+    </div>
+  </div>
+  <div class="hero-overlay"></div>
+</header>
+
+<!-- SOBRE -->
+<section id="sobre" class="secao secao-sobre">
+  <div class="container container-split">
+    <div class="sobre-texto">
+      <p class="secao-label">Sobre o Escritório</p>
+      <h2>Comprometidos com<br>a sua causa</h2>
+      <p>
+        Escritório de advocacia dedicado às áreas de Direito do Trabalho,
+        Previdenciário e Civil, oferecendo atendimento humanizado, análise
+        jurídica estratégica e atuação comprometida com a defesa dos direitos
+        de cada cliente.
+      </p>
+      <p>
+        Mais de uma década de experiência em litígios e assessoria jurídica,
+        com resultados que falam por si.
+      </p>
+    </div>
+    <div class="sobre-stats">
+      <div class="stat">
+        <span class="stat-numero">10+</span>
+        <span class="stat-label">Anos de experiência</span>
+      </div>
+      <div class="stat">
+        <span class="stat-numero">500+</span>
+        <span class="stat-label">Casos resolvidos</span>
+      </div>
+      <div class="stat">
+        <span class="stat-numero">98%</span>
+        <span class="stat-label">Satisfação dos clientes</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ÁREAS -->
+<section id="areas" class="secao secao-escura">
+  <div class="container">
+    <p class="secao-label">Especialidades</p>
+    <h2>Áreas de Atuação</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-num">01</div>
+        <h3>Direito Civil</h3>
+        <p>Contratos, responsabilidade civil, disputas judiciais e extrajudiciais.</p>
+      </div>
+      <div class="card">
+        <div class="card-num">02</div>
+        <h3>Direito Trabalhista</h3>
+        <p>Defesa de empresas e trabalhadores em todas as esferas da Justiça do Trabalho.</p>
+      </div>
+      <div class="card card-destaque">
+        <div class="card-num">03</div>
+        <h3>Direito Previdenciário</h3>
+        <p>Garantindo que o segurado receba o benefício correto, no tempo certo e com o valor justo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AGENDAMENTO -->
+<section id="agenda" class="secao">
+  <div class="container container-narrow">
+    <p class="secao-label">Agende sua Consulta</p>
+    <h2>Fale com um especialista</h2>
+
+    <div id="alerta" class="alerta" role="alert" aria-live="polite" hidden></div>
+
+    <form id="form-agenda" class="form" novalidate>
+      <div class="form-linha">
+        <div class="campo">
+          <label for="nome">Nome completo <span aria-hidden="true">*</span></label>
+          <input type="text" id="nome" placeholder="João Silva" required minlength="2" autocomplete="name">
+          <span class="campo-erro" id="erro-nome"></span>
+        </div>
+        <div class="campo">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" placeholder="joao@email.com" autocomplete="email">
+          <span class="campo-erro" id="erro-email"></span>
+        </div>
+      </div>
+      <div class="form-linha">
+        <div class="campo">
+          <label for="telefone">Telefone / WhatsApp</label>
+          <input type="tel" id="telefone" placeholder="(17) 99999-9999" autocomplete="tel">
+        </div>
+        <div class="campo">
+          <label for="tipo">Modalidade <span aria-hidden="true">*</span></label>
+          <select id="tipo" required>
+            <option value="">Selecione</option>
+            <option value="Online">Online</option>
+            <option value="Presencial">Presencial</option>
+          </select>
+          <span class="campo-erro" id="erro-tipo"></span>
+        </div>
+      </div>
+      <div class="form-linha">
+        <div class="campo">
+          <label for="data">Data <span aria-hidden="true">*</span></label>
+          <input type="date" id="data" required>
+          <span class="campo-erro" id="erro-data"></span>
+        </div>
+        <div class="campo">
+          <label for="hora">Horário <span aria-hidden="true">*</span></label>
+          <select id="hora" required>
+            <option value="">Selecione</option>
+            <option value="09:00">09:00</option>
+            <option value="10:00">10:00</option>
+            <option value="11:00">11:00</option>
+            <option value="14:00">14:00</option>
+            <option value="15:00">15:00</option>
+            <option value="16:00">16:00</option>
+          </select>
+          <span class="campo-erro" id="erro-hora"></span>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primario btn-form" id="btn-agendar">
+        <span id="btn-texto">Confirmar Agendamento</span>
+        <span id="btn-loading" hidden>Aguarde...</span>
+      </button>
+    </form>
+  </div>
+</section>
+
+<!-- CONTATO -->
+<section id="contato" class="secao secao-escura">
+  <div class="container container-split">
+    <div>
+      <p class="secao-label">Fale Conosco</p>
+      <h2>Entre em contato</h2>
+      <div class="contato-infos">
+        <div class="contato-item">
+          <span>📍</span>
+          <span>São José do Rio Preto, SP — Brasil</span>
+        </div>
+        <div class="contato-item">
+          <span>📞</span>
+          <a href="https://wa.me/5517991502882">+55 (17) 99150-2882</a>
+        </div>
+        <div class="contato-item">
+          <span>⏰</span>
+          <span>Seg–Sex, 09h–18h</span>
+        </div>
+      </div>
+    </div>
+    <form class="form" id="form-contato" novalidate>
+      <div class="campo">
+        <label for="c-nome">Seu nome</label>
+        <input type="text" id="c-nome" placeholder="João Silva">
+      </div>
+      <div class="campo">
+        <label for="c-email">E-mail</label>
+        <input type="email" id="c-email" placeholder="joao@email.com">
+      </div>
+      <div class="campo">
+        <label for="c-mensagem">Mensagem</label>
+        <textarea id="c-mensagem" placeholder="Descreva brevemente sua situação..." rows="4"></textarea>
+      </div>
+      <button type="button" class="btn btn-primario" onclick="enviarContato()">Enviar mensagem</button>
+    </form>
+  </div>
+</section>
+
+<!-- MAPA -->
+<section class="mapa" aria-label="Localização no mapa">
+  <iframe
+    title="Localização Padoan Advocacia"
+    loading="lazy"
+    allowfullscreen
+    referrerpolicy="no-referrer-when-downgrade"
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3728.811058677736!2d-49.384568699999996!3d-20.839334800000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94bdb36e04feaf71%3A0x61f23a65d807ec82!2sPadoan%20Advocacia!5e0!3m2!1spt-BR!2sbr!4v1773169735001!5m2!1spt-BR!2sbr">
+  </iframe>
+</section>
+
+<footer>
+  <p>© 2026 Padoan Advocacia — Todos os direitos reservados</p>
+  <a href="/admin/login.html" class="footer-admin">Área do Advogado</a>
+</footer>
+
+<a class="whatsapp-fab" href="https://wa.me/5517991502882" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+  💬
+</a>
+
+<script src="script.js"></script>
+</body>
+</html>

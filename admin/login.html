@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Padoan Advocacia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ouro: #c5a880;
+      --ouro-claro: #e8d5b5;
+      --bg: #0a0a0a;
+      --card: #111111;
+      --borda: #2a2a2a;
+      --texto: #f0ece6;
+      --suave: #888880;
+      --erro: #c0392b;
+      --fonte-titulo: 'Cormorant Garamond', serif;
+      --fonte-corpo: 'Jost', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--fonte-corpo);
+      background: var(--bg);
+      color: var(--texto);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 380px;
+    }
+    .logo {
+      font-family: var(--fonte-titulo);
+      font-size: 22px;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .logo em { color: var(--ouro); font-style: italic; }
+    .subtitulo {
+      text-align: center;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--suave);
+      margin-bottom: 36px;
+    }
+    .campo { margin-bottom: 16px; }
+    label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--suave);
+      margin-bottom: 7px;
+    }
+    input {
+      width: 100%;
+      background: #1a1a1a;
+      border: 1px solid var(--borda);
+      border-radius: 4px;
+      color: var(--texto);
+      font-family: var(--fonte-corpo);
+      font-size: 15px;
+      padding: 12px 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--ouro);
+      box-shadow: 0 0 0 3px rgba(197,168,128,0.12);
+    }
+    input.invalido { border-color: var(--erro); }
+    button {
+      width: 100%;
+      margin-top: 8px;
+      padding: 13px;
+      background: var(--ouro);
+      color: #0a0a0a;
+      border: none;
+      border-radius: 4px;
+      font-family: var(--fonte-corpo);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: var(--ouro-claro); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    #msg-erro {
+      font-size: 13px;
+      color: #e74c3c;
+      text-align: center;
+      margin-top: 14px;
+      min-height: 18px;
+    }
+    .voltar {
+      display: block;
+      text-align: center;
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--suave);
+      text-decoration: none;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .voltar:hover { color: var(--ouro); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Padoan <em>Advocacia</em></div>
+    <p class="subtitulo">Área Restrita</p>
+
+    <form id="form-login" novalidate>
+      <div class="campo">
+        <label for="usuario">Usuário</label>
+        <input type="text" id="usuario" autocomplete="username" required>
+      </div>
+      <div class="campo">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" autocomplete="current-password" required>
+      </div>
+      <button type="submit" id="btn-login">Entrar</button>
+      <div id="msg-erro"></div>
+    </form>
+
+    <a href="/" class="voltar">← Voltar ao site</a>
+  </div>
+
+  <script>
+    document.getElementById("form-login").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const usuario = document.getElementById("usuario").value.trim();
+      const senha   = document.getElementById("senha").value;
+      const btn     = document.getElementById("btn-login");
+      const erro    = document.getElementById("msg-erro");
+
+      if (!usuario || !senha) {
+        erro.textContent = "Preencha usuário e senha.";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Entrando...";
+      erro.textContent = "";
+
+      try {
+        const res = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ usuario, senha }),
+          credentials: "include",
+        });
+
+        if (res.ok) {
+          window.location.href = "/admin/dashboard.html";
+        } else {
+          const data = await res.json();
+          erro.textContent = data.erro || "Usuário ou senha incorretos.";
+          document.getElementById("senha").classList.add("invalido");
+        }
+      } catch {
+        erro.textContent = "Erro de conexão. Tente novamente.";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Entrar";
+      }
+    });
+
+    // Limpa erro ao digitar
+    document.getElementById("senha").addEventListener("input", () => {
+      document.getElementById("senha").classList.remove("invalido");
+      document.getElementById("msg-erro").textContent = "";
+    });
+  </script>
+</body>
+</html>

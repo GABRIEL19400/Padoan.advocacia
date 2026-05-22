@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel — BarberPro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+  <style>
+    :root {
+      --ouro: #d4af37;
+      --ouro-escuro: #b8942a;
+      --bg: #111;
+      --bg-card: #1a1a1a;
+      --erro: #e74c3c;
+      --sucesso: #2ecc71;
+      --fonte-titulo: 'Bebas Neue', sans-serif;
+      --fonte-corpo: 'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--fonte-corpo);
+      background: var(--bg);
+      color: white;
+      padding: 30px 20px;
+    }
+
+    h1 {
+      font-family: var(--fonte-titulo);
+      font-size: 36px;
+      text-align: center;
+      letter-spacing: 2px;
+      margin-bottom: 30px;
+    }
+    h1 span { color: var(--ouro); }
+
+    /* ─── Calendário ─── */
+    #calendar {
+      max-width: 900px;
+      margin: 0 auto 40px;
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+
+    /* ─── Seção da lista ─── */
+    #agenda-detalhada {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #2a2a2a;
+    }
+
+    .lista-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .lista-header h2 {
+      font-family: var(--fonte-titulo);
+      font-size: 22px;
+      letter-spacing: 1px;
+    }
+
+    #contador {
+      font-size: 13px;
+      color: #888;
+    }
+
+    #lista-agenda { padding: 0 24px; }
+
+    /* ─── Estado vazio / carregando ─── */
+    .estado {
+      text-align: center;
+      padding: 40px;
+      color: #555;
+      font-size: 15px;
+    }
+
+    /* ─── Item de agendamento ─── */
+    .agendamento {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid #222;
+      gap: 12px;
+    }
+    .agendamento:last-child { border-bottom: none; }
+
+    .agend-info { display: flex; flex-direction: column; gap: 3px; }
+
+    .agend-nome {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .agend-detalhe {
+      font-size: 13px;
+      color: #888;
+    }
+
+    .agend-data {
+      font-size: 13px;
+      color: var(--ouro);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .agend-acoes { display: flex; gap: 6px; flex-shrink: 0; }
+
+    .agend-acoes button {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--fonte-corpo);
+      font-size: 13px;
+      font-weight: 600;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .agend-acoes button:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    .btn-editar  { background: var(--ouro); color: black; }
+    .btn-excluir { background: var(--erro);  color: white; }
+
+    /* ─── Modal de edição ─── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.ativo { display: flex; }
+
+    .modal {
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 32px;
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid #333;
+    }
+
+    .modal h3 {
+      font-family: var(--fonte-titulo);
+      font-size: 22px;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+
+    .campo {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 14px;
+    }
+
+    .campo label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 5px;
+      letter-spacing: 0.5px;
+    }
+
+    .campo input, .campo select {
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: #2a2a2a;
+      color: white;
+      font-family: var(--fonte-corpo);
+      font-size: 14px;
+    }
+    .campo input:focus, .campo select:focus {
+      outline: none;
+      border-color: var(--ouro);
+    }
+
+    .modal-acoes {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .modal-acoes button {
+      flex: 1;
+      padding: 11px;
+      border: none;
+      border-radius: 6px;
+      font-family: var(--fonte-corpo);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .modal-acoes button:hover { opacity: 0.85; }
+
+    .btn-salvar   { background: var(--ouro); color: black; }
+    .btn-cancelar { background: #333; color: white; }
+
+    #modal-erro {
+      font-size: 13px;
+      color: var(--erro);
+      min-height: 18px;
+      margin-top: 6px;
+    }
+
+    /* ─── Toast ─── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 300;
+    }
+    #toast.visivel { opacity: 1; }
+    #toast.toast-sucesso { background: rgba(46,204,113,0.15); border: 1px solid var(--sucesso); color: #5ddb9a; }
+    #toast.toast-erro    { background: rgba(231,76,60,0.15);  border: 1px solid var(--erro);    color: #ff6b6b; }
+
+    @media (max-width: 600px) {
+      .agendamento { flex-direction: column; align-items: flex-start; }
+      .agend-acoes { width: 100%; }
+      .agend-acoes button { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Agenda <span>BarberPro</span></h1>
+
+<div id="calendar"></div>
+
+<div id="agenda-detalhada">
+  <div class="lista-header">
+    <h2>Agendamentos</h2>
+    <span id="contador">Carregando...</span>
+  </div>
+  <div id="lista-agenda">
+    <p class="estado">Carregando agendamentos...</p>
+  </div>
+</div>
+
+<!-- Modal de edição -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+  <div class="modal">
+    <h3 id="modal-titulo">Editar Agendamento</h3>
+    <input type="hidden" id="edit-id">
+
+    <div class="campo">
+      <label for="edit-nome">Nome</label>
+      <input type="text" id="edit-nome">
+    </div>
+    <div class="campo">
+      <label for="edit-servico">Serviço</label>
+      <select id="edit-servico">
+        <option value="Corte">Corte — R$ 40</option>
+        <option value="Barba">Barba — R$ 30</option>
+        <option value="Corte + Barba">Corte + Barba — R$ 60</option>
+      </select>
+    </div>
+    <div class="campo">
+      <label for="edit-data">Data</label>
+      <input type="date" id="edit-data">
+    </div>
+    <div class="campo">
+      <label for="edit-horario">Horário</label>
+      <select id="edit-horario">
+        <option value="09:00">09:00</option>
+        <option value="10:00">10:00</option>
+        <option value="11:00">11:00</option>
+        <option value="13:00">13:00</option>
+        <option value="14:00">14:00</option>
+        <option value="15:00">15:00</option>
+      </select>
+    </div>
+
+    <div id="modal-erro"></div>
+
+    <div class="modal-acoes">
+      <button class="btn-cancelar" id="btn-cancelar">Cancelar</button>
+      <button class="btn-salvar"   id="btn-salvar">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast de feedback -->
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  const API = "http://localhost:3000";
+  let agendamentoAtual = null;
+
+  // ─── Toast ──────────────────────────────────────────────────────────────────
+  function mostrarToast(mensagem, tipo = "sucesso") {
+    const toast = document.getElementById("toast");
+    toast.textContent = mensagem;
+    toast.className = `visivel toast-${tipo}`;
+    setTimeout(() => { toast.className = ""; }, 3500);
+  }
+
+  // ─── Formatação de data ──────────────────────────────────────────────────────
+  function formatarData(dataStr) {
+    const [ano, mes, dia] = dataStr.split("-");
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  // ─── Carregar lista ──────────────────────────────────────────────────────────
+  async function carregarAgendaDetalhada() {
+    const lista = document.getElementById("lista-agenda");
+    const contador = document.getElementById("contador");
+
+    try {
+      const res = await fetch(API + "/agendamentos");
+      if (!res.ok) throw new Error("Erro na requisição");
+      const dados = await res.json();
+
+      contador.textContent = `${dados.length} agendamento${dados.length !== 1 ? "s" : ""}`;
+
+      if (dados.length === 0) {
+        lista.innerHTML = `<p class="estado">Nenhum agendamento encontrado.</p>`;
+        return;
+      }
+
+      lista.innerHTML = "";
+      dados.forEach(a => {
+        const div = document.createElement("div");
+        div.className = "agendamento";
+        div.innerHTML = `
+          <div class="agend-info">
+            <span class="agend-nome">${a.nome}</span>
+            <span class="agend-detalhe">${a.servico}</span>
+          </div>
+          <span class="agend-data">${formatarData(a.data)} às ${a.horario}</span>
+          <div class="agend-acoes">
+            <button class="btn-editar" data-id="${a.id}">Editar</button>
+            <button class="btn-excluir" data-id="${a.id}">Excluir</button>
+          </div>
+        `;
+
+        div.querySelector(".btn-editar").onclick  = () => abrirModal(a);
+        div.querySelector(".btn-excluir").onclick = () => excluirAgendamento(a.id);
+        lista.appendChild(div);
+      });
+
+    } catch (err) {
+      lista.innerHTML = `<p class="estado" style="color:#e74c3c">Erro ao carregar agendamentos. Verifique o servidor.</p>`;
+      contador.textContent = "—";
+    }
+  }
+
+  // ─── Excluir ─────────────────────────────────────────────────────────────────
+  async function excluirAgendamento(id) {
+    if (!confirm("Deseja realmente excluir este agendamento?")) return;
+    try {
+      const res = await fetch(`${API}/agendamentos/${id}`, { method: "DELETE" });
+      const resp = await res.json();
+      if (!res.ok || resp.erro) throw new Error(resp.erro || "Erro ao excluir");
+      mostrarToast("Agendamento excluído com sucesso.");
+      carregarAgendaDetalhada();
+      calendar.refetchEvents();
+    } catch (err) {
+      mostrarToast(err.message, "erro");
+    }
+  }
+
+  // ─── Modal ───────────────────────────────────────────────────────────────────
+  function abrirModal(a) {
+    agendamentoAtual = a;
+    document.getElementById("edit-id").value      = a.id;
+    document.getElementById("edit-nome").value    = a.nome;
+    document.getElementById("edit-servico").value = a.servico;
+    document.getElementById("edit-data").value    = a.data;
+    document.getElementById("edit-horario").value = a.horario;
+    document.getElementById("modal-erro").textContent = "";
+    document.getElementById("modal-overlay").classList.add("ativo");
+  }
+
+  function fecharModal() {
+    document.getElementById("modal-overlay").classList.remove("ativo");
+    agendamentoAtual = null;
+  }
+
+  document.getElementById("btn-cancelar").onclick = fecharModal;
+  document.getElementById("modal-overlay").onclick = (e) => {
+    if (e.target === document.getElementById("modal-overlay")) fecharModal();
+  };
+
+  document.getElementById("btn-salvar").onclick = async () => {
+    const id      = document.getElementById("edit-id").value;
+    const nome    = document.getElementById("edit-nome").value.trim();
+    const servico = document.getElementById("edit-servico").value;
+    const data    = document.getElementById("edit-data").value;
+    const horario = document.getElementById("edit-horario").value;
+    const erroEl  = document.getElementById("modal-erro");
+
+    if (!nome || nome.length < 2) { erroEl.textContent = "Nome inválido."; return; }
+    if (!data)                     { erroEl.textContent = "Data inválida."; return; }
+
+    try {
+      const res = await fetch(`${API}/agendamentos/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome, servico, data, horario }),
+      });
+      const resp = await res.json();
+      if (!res.ok || resp.erro) { erroEl.textContent = resp.erro || "Erro ao salvar."; return; }
+
+      fecharModal();
+      mostrarToast("Agendamento atualizado com sucesso.");
+      carregarAgendaDetalhada();
+      calendar.refetchEvents();
+    } catch (err) {
+      erroEl.textContent = "Não foi possível conectar ao servidor.";
+    }
+  };
+
+  // ─── Calendário ──────────────────────────────────────────────────────────────
+  document.addEventListener("DOMContentLoaded", function () {
+    const calendarEl = document.getElementById("calendar");
+
+    window.calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: "dayGridMonth",
+      locale: "pt-br",
+      editable: true,
+      selectable: true,
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek"
+      },
+      eventClick: async function (info) {
+        if (confirm(`Excluir agendamento de "${info.event.title.split(" — ")[0]}"?`)) {
+          await excluirAgendamento(info.event.id);
+          info.event.remove();
+        }
+      },
+      eventDrop: async function (info) {
+        const id      = info.event.id;
+        const data    = info.event.startStr.split("T")[0];
+        const horario = info.event.startStr.includes("T")
+          ? info.event.startStr.split("T")[1].substring(0, 5)
+          : agendamentoAtual?.horario || "09:00";
+
+        const parts = info.event.title.split(" — ");
+        const res = await fetch(`${API}/agendamentos/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nome: parts[0], servico: parts[1], data, horario }),
+        });
+        const resp = await res.json();
+        if (!res.ok || resp.erro) {
+          mostrarToast(resp.erro || "Horário indisponível.", "erro");
+          info.revert();
+        } else {
+          mostrarToast("Agendamento reagendado.");
+          carregarAgendaDetalhada();
+        }
+      },
+      events: async function (fetchInfo, successCallback, failureCallback) {
+        try {
+          const res  = await fetch(API + "/agendamentos");
+          const dados = await res.json();
+          const eventos = dados.map(a => ({
+            id:    a.id,
+            title: `${a.nome} — ${a.servico}`,
+            start: `${a.data}T${a.horario}`,
+            backgroundColor: "#d4af37",
+            borderColor:     "#b8942a",
+            textColor:       "#000",
+          }));
+          successCallback(eventos);
+        } catch (err) {
+          failureCallback(err);
+        }
+      }
+    });
+
+    calendar.render();
+    carregarAgendaDetalhada();
+  });
+</script>
+</body>
+</html>
